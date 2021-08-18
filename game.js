@@ -64,11 +64,7 @@ function Runner(outerContainerId, opt_config) {
   this.images = {};
   this.imagesLoaded = 0;
 
-  // if (this.isDisabled()) {
-  //   this.setupDisabledRunner();
-  // } else {
-    this.loadImages();
-  // }
+  this.loadImages();
 
   this.gamepadPreviousKeyDown = false;
 }
@@ -225,32 +221,6 @@ Runner.events = {
 
 Runner.prototype = {
   /**
-   * Whether the easter egg has been disabled. CrOS enterprise enrolled devices.
-   * @return {boolean}
-   */
-  isDisabled: function() {
-    return loadTimeData && loadTimeData.valueExists('disabledEasterEgg');
-  },
-
-  /**
-   * For disabled instances, set up a snackbar with the disabled message.
-   */
-  setupDisabledRunner: function() {
-    this.containerEl = document.createElement('div');
-    this.containerEl.className = Runner.classes.SNACKBAR;
-    this.containerEl.textContent = loadTimeData.getValue('disabledEasterEgg');
-    this.outerContainerEl.appendChild(this.containerEl);
-
-    // Show notification when the activation key is pressed.
-    document.addEventListener(Runner.events.KEYDOWN, function(e) {
-      if (Runner.keycodes.JUMP[e.keyCode]) {
-        this.containerEl.classList.add(Runner.classes.SNACKBAR_SHOW);
-        document.querySelector('.icon').classList.add('icon-disabled');
-      }
-    }.bind(this));
-  },
-
-  /**
    * Setting individual settings for debugging.
    * @param {string} setting
    * @param {*} value
@@ -372,6 +342,7 @@ Runner.prototype = {
       this.createTouchController();
     }
 
+    this.setHighestScore();
     this.startListening();
     this.update();
 
@@ -777,6 +748,7 @@ Runner.prototype = {
     if (this.distanceRan > this.highestScore) {
 		this.highestScore = Math.ceil(this.distanceRan);
 		this.distanceMeter.setHighScore(this.highestScore);
+		localStorage.setItem('highestScore', this.highestScore);
     }
 
     // Reset the time clock.
@@ -843,6 +815,18 @@ Runner.prototype = {
       sourceNode.buffer = soundBuffer;
       sourceNode.connect(this.audioContext.destination);
       sourceNode.start(0);
+    }
+  },
+
+  /**
+   * Get and set highestScore on init.
+   */
+  setHighestScore: function() {
+    var highestScore = localStorage.getItem('highestScore');
+
+    if (highestScore) {
+      this.highestScore = highestScore;
+	  this.distanceMeter.setHighScore(this.highestScore);
     }
   }
 };
