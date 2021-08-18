@@ -1,1 +1,1 @@
-# dino-runner
+# Dino Runner
