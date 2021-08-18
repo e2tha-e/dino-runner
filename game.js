@@ -10,7 +10,7 @@
  * @constructor
  * @export
  */
- var currentScore = 0;
+var currentScore = 0;
 function Runner(outerContainerId, opt_config) {
   // Singleton
   if (Runner.instance_) {
